@@ -12,7 +12,7 @@ package org.openmrs.module.fhir2.providers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.param.DateRangeParam;
 import ca.uhn.fhir.rest.param.StringAndListParam;
 import ca.uhn.fhir.rest.param.StringOrListParam;
@@ -32,7 +33,6 @@ import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.param.TokenAndListParam;
 import ca.uhn.fhir.rest.param.TokenOrListParam;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
-import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.IdType;
@@ -136,14 +136,15 @@ public class PatientFhirResourceProviderTest extends BaseFhirProvenanceResourceT
 		StringAndListParam nameParam = new StringAndListParam().addAnd(new StringOrListParam().add(new StringParam(NAME)));
 		when(patientService.searchForPatients(argThat(is(nameParam)), isNull(), isNull(), isNull(), isNull(), isNull(),
 		    isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
-		            .thenReturn(Collections.singletonList(patient));
+		            .thenReturn(new BaseFhirIBundleResourceProviderTest<>(Collections.singletonList(patient), 10, 1));
 		
-		Bundle results = resourceProvider.searchPatients(nameParam, null, null, null, null, null, null, null, null, null,
-		    null, null, null);
+		IBundleProvider results = resourceProvider.searchPatients(nameParam, null, null, null, null, null, null, null, null,
+		    null, null, null, null);
 		
 		assertThat(results, notNullValue());
-		assertThat(results.isResource(), is(true));
-		assertThat(results.getEntry().size(), greaterThanOrEqualTo(1));
+		assertThat(results.getResources(0, 1), hasSize(equalTo(1)));
+		assertThat(results.getResources(0, 1).get(0).fhirType(), is("Patient"));
+		assertThat(results.getResources(0, 1).get(0).getIdElement().getIdPart(), is(PATIENT_UUID));
 	}
 	
 	@Test
@@ -152,14 +153,15 @@ public class PatientFhirResourceProviderTest extends BaseFhirProvenanceResourceT
 		        .addAnd(new StringOrListParam().add(new StringParam(NAME)));
 		when(patientService.searchForPatients(isNull(), argThat(is(givenNameParam)), isNull(), isNull(), isNull(), isNull(),
 		    isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
-		            .thenReturn(Collections.singletonList(patient));
+		            .thenReturn(new BaseFhirIBundleResourceProviderTest<>(Collections.singletonList(patient), 10, 1));
 		
-		Bundle results = resourceProvider.searchPatients(null, givenNameParam, null, null, null, null, null, null, null,
-		    null, null, null, null);
+		IBundleProvider results = resourceProvider.searchPatients(null, givenNameParam, null, null, null, null, null, null,
+		    null, null, null, null, null);
 		
 		assertThat(results, notNullValue());
-		assertThat(results.isResource(), is(true));
-		assertThat(results.getEntry().size(), greaterThanOrEqualTo(1));
+		assertThat(results.getResources(0, 1), hasSize(equalTo(1)));
+		assertThat(results.getResources(0, 1).get(0).fhirType(), is("Patient"));
+		assertThat(results.getResources(0, 1).get(0).getIdElement().getIdPart(), is(PATIENT_UUID));
 	}
 	
 	@Test
@@ -168,14 +170,15 @@ public class PatientFhirResourceProviderTest extends BaseFhirProvenanceResourceT
 		        .addAnd(new StringOrListParam().add(new StringParam(FAMILY_NAME)));
 		when(patientService.searchForPatients(isNull(), isNull(), argThat(is(familyNameParam)), isNull(), isNull(), isNull(),
 		    isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
-		            .thenReturn(Collections.singletonList(patient));
+		            .thenReturn(new BaseFhirIBundleResourceProviderTest<>(Collections.singletonList(patient), 10, 1));
 		
-		Bundle results = resourceProvider.searchPatients(null, null, familyNameParam, null, null, null, null, null, null,
-		    null, null, null, null);
+		IBundleProvider results = resourceProvider.searchPatients(null, null, familyNameParam, null, null, null, null, null,
+		    null, null, null, null, null);
 		
 		assertThat(results, notNullValue());
-		assertThat(results.isResource(), is(true));
-		assertThat(results.getEntry().size(), greaterThanOrEqualTo(1));
+		assertThat(results.getResources(0, 1), hasSize(equalTo(1)));
+		assertThat(results.getResources(0, 1).get(0).fhirType(), is("Patient"));
+		assertThat(results.getResources(0, 1).get(0).getIdElement().getIdPart(), is(PATIENT_UUID));
 	}
 	
 	@Test
@@ -183,14 +186,15 @@ public class PatientFhirResourceProviderTest extends BaseFhirProvenanceResourceT
 		TokenAndListParam identifierParam = new TokenAndListParam().addAnd(new TokenOrListParam().add(IDENTIFIER));
 		when(patientService.searchForPatients(isNull(), isNull(), isNull(), argThat(is(identifierParam)), isNull(), isNull(),
 		    isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
-		            .thenReturn(Collections.singletonList(patient));
+		            .thenReturn(new BaseFhirIBundleResourceProviderTest<>(Collections.singletonList(patient), 10, 1));
 		
-		Bundle results = resourceProvider.searchPatients(null, null, null, identifierParam, null, null, null, null, null,
-		    null, null, null, null);
+		IBundleProvider results = resourceProvider.searchPatients(null, null, null, identifierParam, null, null, null, null,
+		    null, null, null, null, null);
 		
 		assertThat(results, notNullValue());
-		assertThat(results.isResource(), is(true));
-		assertThat(results.getEntry().size(), greaterThanOrEqualTo(1));
+		assertThat(results.getResources(0, 1), hasSize(equalTo(1)));
+		assertThat(results.getResources(0, 1).get(0).fhirType(), is("Patient"));
+		assertThat(results.getResources(0, 1).get(0).getIdElement().getIdPart(), is(PATIENT_UUID));
 	}
 	
 	@Test
@@ -198,14 +202,15 @@ public class PatientFhirResourceProviderTest extends BaseFhirProvenanceResourceT
 		TokenAndListParam genderParam = new TokenAndListParam().addAnd(new TokenOrListParam().add(GENDER));
 		when(patientService.searchForPatients(isNull(), isNull(), isNull(), isNull(), argThat(is(genderParam)), isNull(),
 		    isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
-		            .thenReturn(Collections.singletonList(patient));
+		            .thenReturn(new BaseFhirIBundleResourceProviderTest<>(Collections.singletonList(patient), 10, 1));
 		
-		Bundle results = resourceProvider.searchPatients(null, null, null, null, genderParam, null, null, null, null, null,
-		    null, null, null);
+		IBundleProvider results = resourceProvider.searchPatients(null, null, null, null, genderParam, null, null, null,
+		    null, null, null, null, null);
 		
 		assertThat(results, notNullValue());
-		assertThat(results.isResource(), is(true));
-		assertThat(results.getEntry().size(), greaterThanOrEqualTo(1));
+		assertThat(results.getResources(0, 1), hasSize(equalTo(1)));
+		assertThat(results.getResources(0, 1).get(0).fhirType(), is("Patient"));
+		assertThat(results.getResources(0, 1).get(0).getIdElement().getIdPart(), is(PATIENT_UUID));
 	}
 	
 	@Test
@@ -213,14 +218,15 @@ public class PatientFhirResourceProviderTest extends BaseFhirProvenanceResourceT
 		DateRangeParam birthDateParam = new DateRangeParam().setLowerBound(BIRTH_DATE).setUpperBound(BIRTH_DATE);
 		when(patientService.searchForPatients(isNull(), isNull(), isNull(), isNull(), isNull(), argThat(is(birthDateParam)),
 		    isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
-		            .thenReturn(Collections.singletonList(patient));
+		            .thenReturn(new BaseFhirIBundleResourceProviderTest<>(Collections.singletonList(patient), 10, 1));
 		
-		Bundle results = resourceProvider.searchPatients(null, null, null, null, null, birthDateParam, null, null, null,
-		    null, null, null, null);
+		IBundleProvider results = resourceProvider.searchPatients(null, null, null, null, null, birthDateParam, null, null,
+		    null, null, null, null, null);
 		
 		assertThat(results, notNullValue());
-		assertThat(results.isResource(), is(true));
-		assertThat(results.getEntry().size(), greaterThanOrEqualTo(1));
+		assertThat(results.getResources(0, 1), hasSize(equalTo(1)));
+		assertThat(results.getResources(0, 1).get(0).fhirType(), is("Patient"));
+		assertThat(results.getResources(0, 1).get(0).getIdElement().getIdPart(), is(PATIENT_UUID));
 	}
 	
 	@Test
@@ -228,14 +234,15 @@ public class PatientFhirResourceProviderTest extends BaseFhirProvenanceResourceT
 		DateRangeParam deathDateParam = new DateRangeParam().setLowerBound(DEATH_DATE).setUpperBound(DEATH_DATE);
 		when(patientService.searchForPatients(isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
 		    argThat(is(deathDateParam)), isNull(), isNull(), isNull(), isNull(), isNull(), isNull()))
-		            .thenReturn(Collections.singletonList(patient));
+		            .thenReturn(new BaseFhirIBundleResourceProviderTest<>(Collections.singletonList(patient), 10, 1));
 		
-		Bundle results = resourceProvider.searchPatients(null, null, null, null, null, null, deathDateParam, null, null,
-		    null, null, null, null);
+		IBundleProvider results = resourceProvider.searchPatients(null, null, null, null, null, null, deathDateParam, null,
+		    null, null, null, null, null);
 		
 		assertThat(results, notNullValue());
-		assertThat(results.isResource(), is(true));
-		assertThat(results.getEntry().size(), greaterThanOrEqualTo(1));
+		assertThat(results.getResources(0, 1), hasSize(equalTo(1)));
+		assertThat(results.getResources(0, 1).get(0).fhirType(), is("Patient"));
+		assertThat(results.getResources(0, 1).get(0).getIdElement().getIdPart(), is(PATIENT_UUID));
 	}
 	
 	@Test
@@ -243,42 +250,47 @@ public class PatientFhirResourceProviderTest extends BaseFhirProvenanceResourceT
 		TokenAndListParam deceasedParam = new TokenAndListParam().addAnd(new TokenOrListParam().add("true"));
 		when(patientService.searchForPatients(isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
 		    argThat(is(deceasedParam)), isNull(), isNull(), isNull(), isNull(), isNull()))
-		            .thenReturn(Collections.singletonList(patient));
+		            .thenReturn(new BaseFhirIBundleResourceProviderTest<>(Collections.singletonList(patient), 10, 1));
 		
-		Bundle results = resourceProvider.searchPatients(null, null, null, null, null, null, null, deceasedParam, null, null,
-		    null, null, null);
+		IBundleProvider results = resourceProvider.searchPatients(null, null, null, null, null, null, null, deceasedParam,
+		    null, null, null, null, null);
 		
 		assertThat(results, notNullValue());
-		assertThat(results.isResource(), is(true));
-		assertThat(results.getEntry().size(), greaterThanOrEqualTo(1));
+		assertThat(results.getResources(0, 1), hasSize(equalTo(1)));
+		assertThat(results.getResources(0, 1).get(0).fhirType(), is("Patient"));
+		assertThat(results.getResources(0, 1).get(0).getIdElement().getIdPart(), is(PATIENT_UUID));
 	}
 	
 	@Test
 	public void searchForPatients_shouldReturnMatchingBundleOfPatientsByCity() {
 		StringAndListParam cityParam = new StringAndListParam().addAnd(new StringOrListParam().add(new StringParam(CITY)));
 		when(patientService.searchForPatients(isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
-		    argThat(is(cityParam)), isNull(), isNull(), isNull(), isNull())).thenReturn(Collections.singletonList(patient));
+		    argThat(is(cityParam)), isNull(), isNull(), isNull(), isNull()))
+		            .thenReturn(new BaseFhirIBundleResourceProviderTest<>(Collections.singletonList(patient), 10, 1));
 		
-		Bundle results = resourceProvider.searchPatients(null, null, null, null, null, null, null, null, cityParam, null,
-		    null, null, null);
+		IBundleProvider results = resourceProvider.searchPatients(null, null, null, null, null, null, null, null, cityParam,
+		    null, null, null, null);
 		
 		assertThat(results, notNullValue());
-		assertThat(results.isResource(), is(true));
-		assertThat(results.getEntry().size(), greaterThanOrEqualTo(1));
+		assertThat(results.getResources(0, 1), hasSize(equalTo(1)));
+		assertThat(results.getResources(0, 1).get(0).fhirType(), is("Patient"));
+		assertThat(results.getResources(0, 1).get(0).getIdElement().getIdPart(), is(PATIENT_UUID));
 	}
 	
 	@Test
 	public void searchForPatients_shouldReturnMatchingBundleOfPatientsByState() {
 		StringAndListParam stateParam = new StringAndListParam().addAnd(new StringOrListParam().add(new StringParam(STATE)));
 		when(patientService.searchForPatients(isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
-		    isNull(), argThat(is(stateParam)), isNull(), isNull(), isNull())).thenReturn(Collections.singletonList(patient));
+		    isNull(), argThat(is(stateParam)), isNull(), isNull(), isNull()))
+		            .thenReturn(new BaseFhirIBundleResourceProviderTest<>(Collections.singletonList(patient), 10, 1));
 		
-		Bundle results = resourceProvider.searchPatients(null, null, null, null, null, null, null, null, null, stateParam,
-		    null, null, null);
+		IBundleProvider results = resourceProvider.searchPatients(null, null, null, null, null, null, null, null, null,
+		    stateParam, null, null, null);
 		
 		assertThat(results, notNullValue());
-		assertThat(results.isResource(), is(true));
-		assertThat(results.getEntry().size(), greaterThanOrEqualTo(1));
+		assertThat(results.getResources(0, 1), hasSize(equalTo(1)));
+		assertThat(results.getResources(0, 1).get(0).fhirType(), is("Patient"));
+		assertThat(results.getResources(0, 1).get(0).getIdElement().getIdPart(), is(PATIENT_UUID));
 	}
 	
 	@Test
@@ -287,14 +299,15 @@ public class PatientFhirResourceProviderTest extends BaseFhirProvenanceResourceT
 		        .addAnd(new StringOrListParam().add(new StringParam(POSTAL_CODE)));
 		when(patientService.searchForPatients(isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
 		    isNull(), isNull(), argThat(is(postalCodeParam)), isNull(), isNull()))
-		            .thenReturn(Collections.singletonList(patient));
+		            .thenReturn(new BaseFhirIBundleResourceProviderTest<>(Collections.singletonList(patient), 10, 1));
 		
-		Bundle results = resourceProvider.searchPatients(null, null, null, null, null, null, null, null, null, null,
+		IBundleProvider results = resourceProvider.searchPatients(null, null, null, null, null, null, null, null, null, null,
 		    postalCodeParam, null, null);
 		
 		assertThat(results, notNullValue());
-		assertThat(results.isResource(), is(true));
-		assertThat(results.getEntry().size(), greaterThanOrEqualTo(1));
+		assertThat(results.getResources(0, 1), hasSize(equalTo(1)));
+		assertThat(results.getResources(0, 1).get(0).fhirType(), is("Patient"));
+		assertThat(results.getResources(0, 1).get(0).getIdElement().getIdPart(), is(PATIENT_UUID));
 	}
 	
 	@Test
@@ -303,14 +316,15 @@ public class PatientFhirResourceProviderTest extends BaseFhirProvenanceResourceT
 		        .addAnd(new StringOrListParam().add(new StringParam(COUNTRY)));
 		when(patientService.searchForPatients(isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull(),
 		    isNull(), isNull(), isNull(), argThat(is(countryParam)), isNull()))
-		            .thenReturn(Collections.singletonList(patient));
+		            .thenReturn(new BaseFhirIBundleResourceProviderTest<>(Collections.singletonList(patient), 10, 1));
 		
-		Bundle results = resourceProvider.searchPatients(null, null, null, null, null, null, null, null, null, null, null,
-		    countryParam, null);
+		IBundleProvider results = resourceProvider.searchPatients(null, null, null, null, null, null, null, null, null, null,
+		    null, countryParam, null);
 		
 		assertThat(results, notNullValue());
-		assertThat(results.isResource(), is(true));
-		assertThat(results.getEntry().size(), greaterThanOrEqualTo(1));
+		assertThat(results.getResources(0, 1), hasSize(equalTo(1)));
+		assertThat(results.getResources(0, 1).get(0).fhirType(), is("Patient"));
+		assertThat(results.getResources(0, 1).get(0).getIdElement().getIdPart(), is(PATIENT_UUID));
 	}
 	
 	@Test

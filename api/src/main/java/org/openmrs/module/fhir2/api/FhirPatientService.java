@@ -9,9 +9,8 @@
  */
 package org.openmrs.module.fhir2.api;
 
-import java.util.Collection;
-
 import ca.uhn.fhir.rest.api.SortSpec;
+import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.param.DateRangeParam;
 import ca.uhn.fhir.rest.param.StringAndListParam;
 import ca.uhn.fhir.rest.param.TokenAndListParam;
@@ -25,7 +24,7 @@ public interface FhirPatientService {
 	
 	PatientIdentifierType getPatientIdentifierTypeByIdentifier(Identifier identifier);
 	
-	Collection<Patient> searchForPatients(StringAndListParam name, StringAndListParam given, StringAndListParam family,
+	IBundleProvider searchForPatients(StringAndListParam name, StringAndListParam given, StringAndListParam family,
 	        TokenAndListParam identifier, TokenAndListParam gender, DateRangeParam birthDate, DateRangeParam deathDate,
 	        TokenAndListParam deceased, StringAndListParam city, StringAndListParam state, StringAndListParam postalCode,
 	        StringAndListParam country, SortSpec sort);
