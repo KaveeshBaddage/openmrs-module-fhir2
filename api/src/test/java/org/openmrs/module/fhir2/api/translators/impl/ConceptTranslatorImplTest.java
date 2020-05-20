@@ -17,11 +17,13 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.hl7.fhir.r4.model.CodeableConcept;
@@ -34,26 +36,33 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.openmrs.Concept;
 import org.openmrs.ConceptMap;
 import org.openmrs.ConceptMapType;
+import org.openmrs.ConceptName;
 import org.openmrs.ConceptReferenceTerm;
 import org.openmrs.ConceptSource;
 import org.openmrs.module.fhir2.FhirConceptSource;
 import org.openmrs.module.fhir2.FhirTestConstants;
 import org.openmrs.module.fhir2.api.FhirConceptService;
 import org.openmrs.module.fhir2.api.FhirConceptSourceService;
+import org.openmrs.module.fhir2.api.FhirUserDefaultProperties;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConceptTranslatorImplTest {
 	
 	private static final String CONCEPT_UUID = "12345-abcdef-12345";
 	
-	@Mock
-	FhirConceptService conceptService;
+	private static final String CONCEPT_NAME = "concept-name";
 	
 	@Mock
-	FhirConceptSourceService conceptSourceService;
+	private FhirConceptService conceptService;
 	
 	@Mock
-	Concept concept;
+	private FhirConceptSourceService conceptSourceService;
+	
+	@Mock
+	private FhirUserDefaultProperties userDefaultProperties;
+	
+	@Mock
+	private Concept concept;
 	
 	private ConceptTranslatorImpl conceptTranslator;
 	
@@ -62,6 +71,16 @@ public class ConceptTranslatorImplTest {
 		conceptTranslator = new ConceptTranslatorImpl();
 		conceptTranslator.setConceptService(conceptService);
 		conceptTranslator.setConceptSourceService(conceptSourceService);
+		conceptTranslator.setUserDefaultProperties(userDefaultProperties);
+	}
+	
+	@Before
+	public void setupMocks() {
+		ConceptName conceptName = mock(ConceptName.class);
+		concept.addName(conceptName);
+		when(conceptName.getName()).thenReturn(CONCEPT_NAME);
+		when(concept.getName(any(Locale.class))).thenReturn(conceptName);
+		when(userDefaultProperties.getDefaultLocale()).thenReturn(Locale.getDefault());
 	}
 	
 	@Test
@@ -73,6 +92,7 @@ public class ConceptTranslatorImplTest {
 		assertThat(result.getCoding(), not(empty()));
 		assertThat(result.getCoding().get(0).getSystem(), nullValue());
 		assertThat(result.getCoding().get(0).getCode(), equalTo(CONCEPT_UUID));
+		assertThat(result.getCoding().get(0).getDisplay(), equalTo(CONCEPT_NAME));
 	}
 	
 	@Test
@@ -99,6 +119,7 @@ public class ConceptTranslatorImplTest {
 		assertThat(result.getCoding(), not(empty()));
 		assertThat(result.getCoding(), hasItem(hasProperty("system", equalTo(FhirTestConstants.LOINC_SYSTEM_URL))));
 		assertThat(result.getCoding(), hasItem(hasProperty("code", equalTo("1000-1"))));
+		assertThat(result.getCoding(), hasItem(hasProperty("display", equalTo(CONCEPT_NAME))));
 	}
 	
 	@Test
@@ -125,6 +146,7 @@ public class ConceptTranslatorImplTest {
 		assertThat(result.getCoding(), not(empty()));
 		assertThat(result.getCoding(), hasItem(hasProperty("system", equalTo(FhirTestConstants.CIEL_SYSTEM_URN))));
 		assertThat(result.getCoding(), hasItem(hasProperty("code", equalTo("1650"))));
+		assertThat(result.getCoding(), hasItem(hasProperty("display", equalTo(CONCEPT_NAME))));
 	}
 	
 	@Test

@@ -42,6 +42,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Patient;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.Obs;
 import org.openmrs.module.fhir2.FhirConstants;
@@ -54,6 +55,7 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
+@Ignore
 @ContextConfiguration(classes = TestFhirSpringConfiguration.class, inheritLocations = false)
 public class ObservationSearchQueryImplTest extends BaseModuleContextSensitiveTest {
 	
